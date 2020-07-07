@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- 요청을 처리할 하위컨트롤러가 누가 될지를 대신 분석해주는 핸들러 매핑을 명시하지 않으면, 스프링에서는 디폴트 핸들러 매핑을 
+		사용하게 된다.. -->
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"></bean>
+
+	<!-- 하위 컨트롤러가 반환한 뷰에 대한 해석을 담당하는 ViewResolver 빈 중 어떤 것을 사용할지 결정한다!! -->
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		p:prefix="/" p:suffix=".jsp" />
+
+
+	<!-- 스프링에서 사용하게 될 빈 객체들 등록 -->
+	<bean id="testController" class="controller.test.TestController"></bean>
+	<!-- 풀메니저 등록 : 싱들턴 -->
+	<bean id="poolManager" class="commons.db.PoolManager"
+		factory-method="getInstance" />
+	<!-- DAO등록 -->
+	<bean id="deptDAO" class="model.company.DeptDAO"/>
+	<bean id="empDAO" class="model.company.EmpDAO"/>
+
+	<bean id="memberService" class="model.company.MemberService"
+		p:pool-ref="poolManager"
+		p:deptDAO-ref="deptDAO"
+		p:empDAO-ref="empDAO">
+	</bean>
+
+	<bean id="memberController"
+		class="controller.company.MemberController"
+		p:memberService-ref="memberService">
+	</bean>
+
+</beans>
